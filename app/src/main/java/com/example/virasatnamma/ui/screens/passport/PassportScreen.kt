@@ -21,7 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.virasatnamma.data.local.CheckInEntity
-import com.example.virasatnamma.ui.theme.*
+import com.example.virasatnamma.ui.theme.BrownDark
+import com.example.virasatnamma.ui.theme.BrownMedium
+import com.example.virasatnamma.ui.theme.GoldPrimary
 import com.example.virasatnamma.viewmodel.HeritageViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,62 +37,69 @@ fun PassportScreen(viewModel: HeritageViewModel) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        Header(checkIns.size)
+        // Header
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Brush.verticalGradient(listOf(BrownDark, BrownMedium)))
+                .padding(20.dp)
+        ) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.MenuBook, null, tint = GoldPrimary)
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        "Travel Passport",
+                        color = GoldPrimary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                }
+                Text(
+                    "${checkIns.size} site${if (checkIns.size != 1) "s" else ""} visited",
+                    color = Color.White.copy(0.7f),
+                    fontSize = 13.sp
+                )
+            }
+        }
 
         if (checkIns.isEmpty()) {
             EmptyPassportContent()
         } else {
-            StampHeader(checkIns.size)
+            // Stamp badge
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(14.dp),
+                color = GoldPrimary.copy(alpha = 0.15f)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.CheckCircle, null, tint = GoldPrimary, modifier = Modifier.size(28.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            "${checkIns.size} of 12 stamps collected",
+                            fontWeight = FontWeight.Bold,
+                            color = BrownDark,
+                            fontSize = 15.sp
+                        )
+                        Text("Keep exploring Karnataka!", color = BrownMedium, fontSize = 12.sp)
+                    }
+                }
+            }
 
             LazyColumn(
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(checkIns) { checkIn ->
                     PassportStampCard(checkIn, viewModel)
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun Header(count: Int) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Brush.verticalGradient(listOf(BrownDark, BrownMedium)))
-            .padding(20.dp)
-    ) {
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.MenuBook, null, tint = GoldPrimary)
-                Spacer(Modifier.width(8.dp))
-                Text("Travel Passport", color = GoldPrimary, fontWeight = FontWeight.Bold)
-            }
-            Text(
-                "$count site${if (count != 1) "s" else ""} visited",
-                color = Color.White.copy(0.7f)
-            )
-        }
-    }
-}
-
-@Composable
-private fun StampHeader(count: Int) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(14.dp),
-        color = GoldPrimary.copy(alpha = 0.15f)
-    ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            Icon(Icons.Default.CheckCircle, null, tint = GoldPrimary)
-            Spacer(Modifier.width(8.dp))
-            Column {
-                Text("$count of 5 stamps collected", fontWeight = FontWeight.Bold)
-                Text("Keep exploring Karnataka!")
+                item { Spacer(Modifier.height(16.dp)) }
             }
         }
     }
@@ -109,7 +118,9 @@ private fun PassportStampCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp)
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(3.dp)
     ) {
         Row(
             modifier = Modifier
@@ -117,33 +128,39 @@ private fun PassportStampCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.CheckCircle, null, tint = GoldPrimary)
+            Surface(
+                shape = RoundedCornerShape(50),
+                color = BrownDark,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Icon(Icons.Default.CheckCircle, null, tint = GoldPrimary, modifier = Modifier.size(26.dp))
+                }
+            }
 
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(checkIn.siteName, fontWeight = FontWeight.Bold)
-                Row {
-                    Icon(Icons.Default.LocationOn, null, tint = GoldPrimary)
-                    Spacer(Modifier.width(4.dp))
-                    Text(checkIn.siteLocation)
+                Text(checkIn.siteName, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = BrownDark)
+                Spacer(Modifier.height(2.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.LocationOn, null, tint = GoldPrimary, modifier = Modifier.size(12.dp))
+                    Spacer(Modifier.width(3.dp))
+                    Text(checkIn.siteLocation, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Text(dateStr, fontSize = 12.sp)
+                Spacer(Modifier.height(2.dp))
+                Text(dateStr, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f))
             }
 
-            // ✏️ EDIT BUTTON
             IconButton(onClick = { showEditDialog = true }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit")
+                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownMedium)
             }
-
-            // 🗑️ DELETE BUTTON
             IconButton(onClick = { showDeleteDialog = true }) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
             }
         }
     }
 
-    // ✏️ EDIT DIALOG
     if (showEditDialog) {
         EditDialog(
             checkIn = checkIn,
@@ -155,7 +172,6 @@ private fun PassportStampCard(
         )
     }
 
-    // 🗑️ DELETE CONFIRMATION
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
@@ -166,14 +182,10 @@ private fun PassportStampCard(
                         showDeleteDialog = false
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text("Delete")
-                }
+                ) { Text("Delete") }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
-                }
+                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
             },
             title = { Text("Delete Entry") },
             text = { Text("Are you sure you want to delete this stamp?") }
@@ -193,23 +205,27 @@ private fun EditDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            Button(onClick = {
-                onSave(checkIn.copy(siteName = name, siteLocation = location))
-            }) {
+            Button(onClick = { onSave(checkIn.copy(siteName = name, siteLocation = location)) }) {
                 Text("Save")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
+            TextButton(onClick = onDismiss) { Text("Cancel") }
         },
         title = { Text("Edit Stamp") },
         text = {
             Column {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Site Name") })
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Site Name") }
+                )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text("Location") })
+                OutlinedTextField(
+                    value = location,
+                    onValueChange = { location = it },
+                    label = { Text("Location") }
+                )
             }
         }
     )
@@ -218,11 +234,31 @@ private fun EditDialog(
 @Composable
 private fun EmptyPassportContent() {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(Icons.Default.MenuBook, null, tint = GoldPrimary.copy(0.5f))
-        Text("Your passport is empty", fontWeight = FontWeight.Bold)
+        Icon(
+            Icons.Default.MenuBook,
+            null,
+            tint = GoldPrimary.copy(0.4f),
+            modifier = Modifier.size(80.dp)
+        )
+        Spacer(Modifier.height(20.dp))
+        Text(
+            "Your passport is empty",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            color = BrownDark
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Visit heritage sites and tap 'Check In' to collect stamps!",
+            fontSize = 13.sp,
+            color = BrownMedium,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
     }
 }
